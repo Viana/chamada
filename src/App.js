@@ -8,18 +8,58 @@ import { format } from 'date-fns';
 
 
 // import {confirm} from 'react-confirm'
-const API = "http://localhost:3001";
+const API = 'http://localhost:3001';
 
 function App() {
 
   const [cracha, setCracha] = useState("");
   var today = format(new Date(), 'dd/MM/yyyy');
-  console.log('>>>>>> ' + today)
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault()
-    let flaq = true;
-    const respObr = await axios.get(API + "/obreiros"),{data:cracha};
+    let flaq = false;
+
+    const opt = {
+      method: 'GET',
+      mode: 'cors',
+      cache: 'default'
+    }
+    fetch(API + '/obreiros', opt)
+      .then((r) => r.json())
+      .then(resposta => {
+        console.log(resposta)
+        resposta.map((num) => {
+          console.log(typeof num.cracha + " <<>> " + typeof cracha)
+          console.log(num.cracha + " > " + parseInt(cracha))
+          if (parseInt(cracha) === num.cracha) {
+            flaq = true
+          }
+        }
+        )
+        if (!flaq) {
+          swal.fire("Opa!", "Número do Crachá não existe !!", "warning")
+        }
+      });
+    // axios.request(teste).then((response) => { console.log(response.data) })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    const respObr = await axios.get(`http://localhost:3001/obreiros`)
+
     const resp = await axios.get(API + "/cracha")
 
     // respObr.data.map((obrExiste) => {
@@ -38,10 +78,10 @@ function App() {
 
       // Data do banco pegando para comparar com a data de hoje
       var dataDB = format(new Date(dados.dataCriacao), 'dd/MM/yyyy')
-   
+
 
       breakme: {
-       if (parseInt(cracha) === dados.cracha && today === dataDB) {
+        if (parseInt(cracha) === dados.cracha && today === dataDB) {
           flaq = false;
           // alert("Crachá já cadastrado")
           swal.fire("Opa!", "Número do Crachá já inserido !!!", "warning")
@@ -52,7 +92,7 @@ function App() {
     if (flaq) {
 
       respObr.data.map((obr) => {
-         breakme: {
+        breakme: {
           if (parseInt(cracha) === obr.cracha) {
             // let nm =  swal.fire("teste",{buttons:[true,'false']});
 
@@ -103,7 +143,7 @@ function App() {
           <div className="form-control">
             <input
               type="text"
-              onKeyPress={e => {if(!/[0-9]/.test(e.key)) e.preventDefault()}}
+              onKeyPress={e => { if (!/[0-9]/.test(e.key)) e.preventDefault() }}
               name="cracha"
               placeholder="Numero da chamada"
               onChange={(e) => setCracha(e.target.value)}
